@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>BBT Book Distribution Management</title>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-light: #1b263b;
+    --accent: #e63946;
+    --saffron: #f77f00;
+    --green: #2a9d8f;
+    --purple: #5f259f;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--text); padding-bottom: 76px; -webkit-tap-highlight-color: transparent; }
+
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 300;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .brand-title { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
+  .brand-sub { font-size: 0.68rem; color: #94a3b8; }
+  
+  .role-picker {
+    background: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    outline: none;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 300;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 9px 2px 7px 2px;
+    text-align: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    border-top: 3px solid transparent;
+  }
+  .nav-btn.active {
+    color: var(--navy);
+    border-top-color: var(--saffron);
+    background: #fffcf8;
+  }
+  .nav-icon { font-size: 1.15rem; display: block; margin-bottom: 2px; }
+
+  .container { max-width: 980px; margin: 10px auto; padding: 0 10px; }
+
+  .card {
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 8px;
+  }
+  .card-title { font-size: 0.92rem; font-weight: 800; color: var(--navy); }
+
+  .form-group { margin-bottom: 10px; }
+  label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; }
+  select, input, textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #fff;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    gap: 6px;
+  }
+  .btn-primary { background: var(--navy); color: white; }
+  .btn-success { background: var(--green); color: white; }
+  .btn-danger { background: var(--accent); color: white; }
+  .btn-saffron { background: var(--saffron); color: white; }
+  .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); width: auto; padding: 6px 10px; font-size: 0.78rem; }
+
+  .tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; }
+  .tag-tel { background: #e0f2fe; color: #0284c7; }
+  .tag-eng { background: #f0fdf4; color: #16a34a; }
+  .tag-hin { background: #fff7ed; color: #ea580c; }
+  .tag-tam { background: #fdf4ff; color: #c026d3; }
+  .tag-kan { background: #fefce8; color: #ca8a04; }
+
+  .stepper { display: inline-flex; align-items: center; gap: 4px; }
+  .step-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
+  th, td { padding: 8px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  th { background: #f8fafc; font-weight: 700; color: #475569; font-size: 0.72rem; text-transform: uppercase; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .kpi-card { background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+  .kpi-num { font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-top: 2px; }
+
+  .report-box {
+    background: #eef2f6;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 0.78rem;
+    white-space: pre-wrap;
+    line-height: 1.4;
+    color: #1e293b;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand-title">BBT BOOK MANAGEMENT</div>
+    <div class="brand-sub">ISKCON / Hare Krishna Lotus Temple &bull; Tirupati</div>
+  </div>
+  <select id="app-location-select" class="role-picker" onchange="onLocationChange()">
+    <optgroup label="Stalls (Salesperson Mode)">
+      <option value="SVM" selected>SVM Stall</option>
+      <option value="GT">GT Stall</option>
+      <option value="PAT">PAT Stall</option>
+      <option value="SP">SP Stall</option>
+      <option value="SPL">SPL Stall</option>
+      <option value="7TH MILE">7th Mile Stall</option>
+      <option value="PPV">PPV Stall</option>
+      <option value="PLKN">PLKN Stall</option>
+      <option value="KPM">KPM Stall</option>
+      <option value="RTC">RTC Stall</option>
+    </optgroup>
+    <optgroup label="BBT Central">
+      <option value="BBT">BBT Main Godown / Accounts</option>
+    </optgroup>
+  </select>
+</header>
+
+<div class="container">
+
+  <!-- TAB 1: POS BILLING -->
+  <div id="view-pos">
+    <div class="card" style="display:grid; grid-template-columns: 1.3fr 1fr; gap:12px;">
+      <div>
+        <div class="card-header">
+          <span class="card-title">Catalog (<span class="cur-stall-txt">SVM</span>)</span>
+          <div style="display:flex; gap:6px;">
+            <select id="pos-lang-select" onchange="renderPOSCatalog()" style="width:auto; padding:3px 6px; font-size:0.75rem;">
+              <option value="ALL">All Languages</option>
+              <option value="Telugu">Telugu</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Kannada">Kannada</option>
+            </select>
+            <button class="btn btn-outline" onclick="triggerCameraInput()">&#128247; AI Photo</button>
+          </div>
+        </div>
+
+        <input type="text" id="pos-search-input" placeholder="Search book name, code..." oninput="renderPOSCatalog()" style="margin-bottom:8px;">
+        <input type="file" id="camera-file-input" accept="image/*" capture="environment" style="display:none;" onchange="handleAIPhoto(event)">
+
+        <div style="max-height:380px; overflow-y:auto; padding-right:4px;" id="pos-items-list"></div>
+      </div>
+
+      <div style="border-left:1px solid var(--border); padding-left:12px;">
+        <div class="card-header">
+          <span class="card-title">Cart (<span id="cart-item-count">0</span>)</span>
+          <button class="btn btn-outline" style="color:var(--accent); border:none;" onclick="clearCart()">Clear</button>
+        </div>
+
+        <div style="background:#faf5ff; border:1px dashed var(--purple); border-radius:6px; padding:6px 10px; font-size:0.75rem; color:var(--purple); margin-bottom:8px;">
+          UPI: <strong id="stall-upi-text">bbt.svm@ybl</strong> &bull; <span id="stall-mid-text">MID: BBT-SVM-01</span>
+        </div>
+
+        <div style="min-height:160px; max-height:220px; overflow-y:auto;" id="pos-cart-container">
+          <div style="text-align:center; color:var(--muted); padding-top:40px; font-size:0.82rem;">Tap books on the left to add.</div>
+        </div>
+
+        <div style="border-top:1px solid #f1f5f9; padding-top:8px; margin-top:8px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-size:0.8rem; color:var(--muted);">Total Copies: <strong id="cart-total-qty">0</strong></span>
+            <span style="font-size:1.15rem; font-weight:800; color:var(--navy);" id="cart-total-val">₹0</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:8px;">
+            <button id="pay-btn-cash" class="btn" style="background:#dcfce7; color:#15803d; border:2px solid #86efac;" onclick="setPaymentMode('CASH')">&#128181; Cash</button>
+            <button id="pay-btn-phonepe" class="btn" style="background:white; color:var(--purple); border:1px solid var(--border);" onclick="setPaymentMode('PHONEPE')">&#128241; PhonePe</button>
+          </div>
+
+          <button id="btn-confirm-pos" class="btn btn-success" onclick="commitSale()" disabled>Confirm &amp; Post Sale &#10003;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: TRANSFERS -->
+  <div id="view-transfers" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Transfers &amp; Receiving Verification</span>
+        <button class="btn btn-outline" onclick="openCreateTransferModal()" id="btn-open-dispatch">+ New Dispatch (BBT)</button>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <strong style="font-size:0.85rem; color:var(--navy);">In-Transit Shipments for <span class="cur-stall-txt">SVM</span>:</strong>
+      </div>
+      <div id="receiving-cards-container"></div>
+
+      <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
+        <strong style="font-size:0.85rem; color:var(--navy); display:block; margin-bottom:8px;">Transfer History Log</strong>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Challan #</th><th>From &rarr; To</th><th>Status</th><th>Total Sent</th><th>Actual Received</th></tr>
+            </thead>
+            <tbody id="transfer-history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: RETURNS -->
+  <div id="view-returns" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Customer Book Exchange / Return</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="form-group">
+          <label>Transaction Type</label>
+          <select id="ret-type-select" onchange="toggleReturnType()">
+            <option value="EXCHANGE" selected>Exchange (Swap Book)</option>
+            <option value="RETURN">Direct Return (Cash Refund)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Original Invoice # (Optional)</label>
+          <input type="text" id="ret-inv-input" placeholder="e.g. INV-SVM-1024">
+        </div>
+      </div>
+
+      <div style="background:#fff8f8; padding:10px; border-radius:8px; border:1px solid #fed7d7; margin-bottom:10px;">
+        <strong style="color:var(--accent); font-size:0.82rem; display:block; margin-bottom:6px;">OLD BOOK RETURNED</strong>
+        <select id="ret-old-book" onchange="calcExchangeDiff()"></select>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
+          <input type="number" id="ret-old-qty" value="1" min="1" oninput="calcExchangeDiff()" placeholder="Qty">
+          <select id="ret-old-cond">
+            <option value="GOOD">Good / Resellable</option>
+            <option value="DAMAGED">Damaged / Defect</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="exchange-new-section" style="background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0; margin-bottom:10px;">
+        <strong style="color:var(--green); font-size:0.82rem; display:block; margin-bottom:6px;">NEW BOOK ISSUED</strong>
+        <select id="ret-new-book" onchange="calcExchangeDiff()"></select>
+        <div style="margin-top:6px;">
+          <input type="number" id="ret-new-qty" value="1" min="1" oninput="calcExchangeDiff()" placeholder="Qty">
+        </div>
+      </div>
+
+      <div id="ret-diff-box" style="padding:10px; border-radius:8px; text-align:center; font-weight:800; font-size:1.1rem; background:#f8fafc; border:1px solid var(--border); margin-bottom:12px;">
+        Settlement: ₹0 (Even)
+      </div>
+
+      <button class="btn btn-primary" onclick="commitReturnOrExchange()">Confirm Transaction &amp; Update Stock &#10148;</button>
+    </div>
+  </div>
+
+  <!-- TAB 4: REPLENISH -->
+  <div id="view-replenish" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <span class="card-title">Sales-Driven Replenishment Queue</span>
+          <span style="font-size:0.72rem; color:var(--muted); display:block;">Preserves distinct Book + Language identity</span>
+        </div>
+        <button class="btn btn-saffron" style="width:auto; padding:6px 12px;" onclick="convertReplenishToTransfer()">Dispatch from BBT Godown &rarr;</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Stall</th><th>Book Title</th><th>Language</th><th>Remaining Stock</th><th>Units Sold</th><th>Required Indent</th></tr>
+          </thead>
+          <tbody id="replenish-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: DAY CLOSE -->
+  <div id="view-dayclose" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Daily Closing &amp; Cash Reconciliation (<span class="cur-stall-txt">SVM</span>)</span>
+        <span class="tag" id="dayclose-status-tag" style="background:#fef3c7; color:#92400e;">SESSION OPEN</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card"><div style="font-size:0.7rem; color:var(--muted);">CASH SALES</div><div class="kpi-num" id="close-kpi-cash">₹0</div></div>
+        <div class="kpi-card"><div style="font-size:0.7rem; color:var(--muted);">PHONEPE SALES</div><div class="kpi-num" id="close-kpi-phonepe">₹0</div></div>
+        <div class="kpi-card"><div style="font-size:0.7rem; color:var(--muted);">TOTAL BOOKS</div><div class="kpi-num" id="close-kpi-books">0</div></div>
+      </div>
+
+      <div class="form-group">
+        <label>Counted Physical Cash (₹)</label>
+        <input type="number" id="close-actual-cash" placeholder="Enter counted physical notes" oninput="auditCashDiff()">
+      </div>
+      <div id="close-diff-badge" style="padding:8px; border-radius:6px; font-size:0.82rem; font-weight:bold; margin-bottom:12px; background:#f8fafc;">
+        Cash Variance: ₹0 (Match)
+      </div>
+
+      <button class="btn btn-danger" onclick="commitStallDayClose()">&#128274; Complete Day Close &amp; Generate WhatsApp Report</button>
+
+      <div id="close-report-wrapper" style="display:none; margin-top:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:0.85rem; color:var(--navy);">Formatted Accounts Report:</strong>
+          <button class="btn btn-outline" onclick="copyClosingReport()">&#128203; Copy to WhatsApp</button>
+        </div>
+        <div class="report-box" id="closing-report-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: ADMIN -->
+  <div id="view-admin" style="display:none;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Consolidated BBT Executive Overview</span>
+        <button class="btn btn-outline" onclick="exportAccountingCSV()">&#8681; Export Accounting CSV</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card"><div style="font-size:0.7rem;">TOTAL REVENUE</div><div class="kpi-num" id="adm-kpi-rev">₹0</div></div>
+        <div class="kpi-card"><div style="font-size:0.7rem;">CASH COLLECTED</div><div class="kpi-num" id="adm-kpi-cash">₹0</div></div>
+        <div class="kpi-card"><div style="font-size:0.7rem;">PHONEPE BANK</div><div class="kpi-num" id="adm-kpi-phonepe">₹0</div></div>
+        <div class="kpi-card"><div style="font-size:0.7rem;">STOCK ASSET VALUE</div><div class="kpi-num" id="adm-kpi-stockval">₹0</div></div>
+      </div>
+
+      <span class="card-title" style="font-size:0.84rem; margin-top:8px; display:block;">Stall Status Matrix</span>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Stall</th><th>Status</th><th>Books Sold</th><th>Cash (₹)</th><th>PhonePe (₹)</th><th>Total (₹)</th></tr></thead>
+          <tbody id="adm-stalls-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav">
+  <div class="nav-btn active" id="nav-pos" onclick="switchNav('pos')"><span class="nav-icon">&#128722;</span>POS Billing</div>
+  <div class="nav-btn" id="nav-transfers" onclick="switchNav('transfers')"><span class="nav-icon">&#128230;</span>Transfers</div>
+  <div class="nav-btn" id="nav-returns" onclick="switchNav('returns')"><span class="nav-icon">&#8644;</span>Returns</div>
+  <div class="nav-btn" id="nav-replenish" onclick="switchNav('replenish')"><span class="nav-icon">&#128260;</span>Replenish</div>
+  <div class="nav-btn" id="nav-dayclose" onclick="switchNav('dayclose')"><span class="nav-icon">&#128181;</span>Day Close</div>
+  <div class="nav-btn" id="nav-admin" onclick="switchNav('admin')"><span class="nav-icon">&#128202;</span>Admin</div>
+</div>
+
+<script>
+const defaultCatalog = [
+  { id: 1, item_code: 'BBT-001-TEL', name: 'Bhagavad Gita As It Is - Deluxe', lang: 'Telugu', price: 600, cat: 'Maha Big' },
+  { id: 2, item_code: 'BBT-002-TEL', name: 'Bhagavad Gita As It Is (BIG)', lang: 'Telugu', price: 350, cat: 'Big Books' },
+  { id: 3, item_code: 'BBT-002-ENG', name: 'Bhagavad Gita As It Is (BIG)', lang: 'English', price: 400, cat: 'Big Books' },
+  { id: 4, item_code: 'BBT-002-HIN', name: 'Bhagavad Gita As It Is (BIG)', lang: 'Hindi', price: 350, cat: 'Big Books' },
+  { id: 5, item_code: 'BBT-002-TAM', name: 'Bhagavad Gita As It Is (BIG)', lang: 'Tamil', price: 350, cat: 'Big Books' },
+  { id: 6, item_code: 'BBT-002-KAN', name: 'Bhagavad Gita As It Is (BIG)', lang: 'Kannada', price: 350, cat: 'Big Books' },
+  { id: 7, item_code: 'BBT-003-TEL', name: 'Bhagavad Gita As It Is (SMALL)', lang: 'Telugu', price: 150, cat: 'Medium Books' },
+  { id: 8, item_code: 'BBT-004-TEL', name: 'Krsna - Supreme Personality of Godhead', lang: 'Telugu', price: 450, cat: 'Medium Books' },
+  { id: 9, item_code: 'BBT-004-ENG', name: 'Krsna - Supreme Personality of Godhead', lang: 'English', price: 500, cat: 'Medium Books' },
+  { id: 10, item_code: 'BBT-005-TEL', name: 'The Stories of Krishna (4vol)', lang: 'Telugu', price: 900, cat: 'Sets' },
+  { id: 11, item_code: 'BBT-006-TEL', name: 'Srimad Bhagavatam First Canto', lang: 'Telugu', price: 600, cat: 'Maha Big' },
+  { id: 12, item_code: 'BBT-015-ENG', name: 'Nectar of Devotion', lang: 'English', price: 250, cat: 'Medium Books' },
+  { id: 13, item_code: 'BBT-018-TEL', name: 'Science of Self - Realization', lang: 'Telugu', price: 250, cat: 'Medium Books' },
+  { id: 14, item_code: 'BBT-018-ENG', name: 'Science of Self - Realization', lang: 'English', price: 275, cat: 'Medium Books' },
+  { id: 15, item_code: 'BBT-026-TEL', name: 'Second Chance', lang: 'Telugu', price: 150, cat: 'Small Books' },
+  { id: 16, item_code: 'BBT-035-TEL', name: 'Ramayana soft', lang: 'Telugu', price: 300, cat: 'Medium Books' }
