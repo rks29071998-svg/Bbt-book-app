@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BBT Stall POS</title>
+  <style>
+    :root {
+      --navy: #0b192c;
+      --navy-dark: #07101e;
+      --navy-light: #1e3e62;
+      --accent-blue: #0284c7;
+      --accent-blue-hover: #0369a1;
+      --saffron: #f97316;
+      --green: #10b981;
+      --green-dark: #059669;
+      --purple: #7e22ce;
+      --purple-bg: #faf5ff;
+      --purple-border: #d8b4fe;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 70px;
+      user-select: none;
+    }
+
+    /* TOP HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
+    .header-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+
+    .badge-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .badge-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* UPI SUB-HEADER */
+    .upi-banner {
+      background: var(--purple-bg);
+      border-top: 1px dashed var(--purple-border);
+      border-bottom: 1px dashed var(--purple-border);
+      padding: 7px 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--purple);
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* CONTAINER */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* SEARCH & FILTER */
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 40px;
+      padding: 8px 36px 8px 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .filter-select {
+      height: 40px;
+      padding: 0 10px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+    }
+
+    /* BOOK CARD */
+    .book-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .book-info {
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .book-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .book-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag-lang {
+      font-size: 11px;
+      font-weight: 600;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .book-code {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: monospace;
+    }
+
+    .book-pricing {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 80px;
+    }
+
+    .book-price {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .book-stock {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-top: 2px;
+      margin-bottom: 6px;
+    }
+
+    .btn-add {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-add:active {
+      transform: scale(0.95);
+    }
+
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .qty-stepper button {
+      background: none;
+      border: none;
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .qty-stepper span {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 0 6px;
+    }
+
+    /* FLOATING CHECKOUT BAR */
+    .floating-cart {
+      position: fixed;
+      bottom: 64px;
+      left: 12px;
+      right: 12px;
+      max-width: 456px;
+      margin: 0 auto;
+      background: var(--navy);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      z-index: 35;
+    }
+
+    .cart-summary-qty {
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .cart-summary-total {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .btn-checkout {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-checkout:active {
+      transform: scale(0.96);
+    }
+
+    /* BOTTOM NAV */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      z-index: 40;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 8px 0;
+      background: none;
+      border: none;
+      border-top: 3px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: var(--accent-blue);
+      border-top-color: var(--accent-blue);
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    /* MODAL OVERLAY */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .modal-tag {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-top: 6px;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stall-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .stall-choice {
+      padding: 8px 0;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .stall-choice.selected {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    .shift-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .shift-choice {
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .shift-choice.selected {
+      background: #f0fdf4;
+      border-color: var(--green);
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+    .input-text:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* PAYMENT UI */
+    .pay-mode-toggle {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 10px;
+      gap: 3px;
+      margin-bottom: 14px;
+    }
+
+    .pay-btn {
+      padding: 8px 0;
+      background: none;
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .pay-btn.selected {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .split-box {
+      background: var(--purple-bg);
+      border: 1px solid var(--purple-border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .split-input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .qr-box {
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .qr-box img {
+      width: 160px;
+      height: 160px;
+      margin: 8px auto;
+      display: block;
+      background: #fff;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 10px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 10px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* DAY CLOSE SUMMARY */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .stat-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .stat-val {
+      font-size: 18px;
+      font-weight: 900;
+      margin-top: 2px;
+      color: var(--text);
+    }
+
+    .btn-whatsapp {
+      width: 100%;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div>
+        <div class="header-title">BBT STALL POS</div>
+        <div id="hdrVolunteer" class="header-sub">Balaji & Ramudu</div>
+      </div>
+      <button class="badge-btn" onclick="openShiftModal()">
+        <span>🔒</span>
+        <span id="hdrBadge">SVM - 1</span>
+      </button>
+    </div>
+    <div class="upi-banner">
+      <span id="hdrUpi">UPI: bbt.svm@ybl</span>
+      <span id="hdrMid">MID: BBT-SVM-01</span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="app-container">
+
+    <!-- 1. BILLING TAB -->
+    <div id="tabBilling">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search book name, code..." oninput="renderBooks()">
+          <span class="search-icon">🔍</span>
+        </div>
+        <select id="langFilter" class="filter-select" onchange="renderBooks()">
+          <option value="ALL">All Lang</option>
+          <option value="Telugu">Telugu</option>
+          <option value="English">English</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Kannada">Kannada</option>
+        </select>
+      </div>
+
+      <div id="bookList"></div>
+    </div>
+
+    <!-- 2. RECEIVING TAB -->
+    <div id="tabReceiving" class="hidden">
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <h3 style="font-size:15px; font-weight:800; margin-bottom:4px;">📦 Receive Depot Stock</h3>
+        <p style="font-size:11px; color:var(--muted); margin-bottom:14px;">Add incoming books to stall inventory</p>
+
+        <div class="form-group">
+          <label class="form-label">Select Book</label>
+          <select id="recvSelect" class="input-text"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" id="recvQty" class="input-text" placeholder="e.g. 25" min="1">
+        </div>
+        <button class="btn-submit" onclick="submitReceiving()">Add Stock</button>
+      </div>
+    </div>
+
+    <!-- 3. RETURNS TAB -->
+    <div id="tabReturns" class="hidden">
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px;">
+        <h3 style="font-size:15px; font-weight:800; margin-bottom:4px;">🔄 Return to Central</h3>
+        <p style="font-size:11px; color:var(--muted); margin-bottom:14px;">Deduct returned or damaged books</p>
+
+        <div class="form-group">
+          <label class="form-label">Select Book</label>
+          <select id="retSelect" class="input-text"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" id="retQty" class="input-text" placeholder="e.g. 5" min="1">
+        </div>
+        <button class="btn-submit" style="background:var(--saffron);" onclick="submitReturn()">Log Return</button>
+      </div>
+    </div>
+
+    <!-- 4. DAY CLOSE TAB -->
+    <div id="tabDayClose" class="hidden">
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <h3 style="font-size:15px; font-weight:800;">Shift Reconciliation</h3>
+            <p id="dcShiftInfo" style="font-size:11px; color:var(--muted);"></p>
+          </div>
+          <span style="font-size:10px; background:#dcfce7; color:#15803d; font-weight:800; padding:2px 8px; border-radius:99px;">ACTIVE</span>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-lbl">Total Sales</div>
+            <div id="dcTotalSales" class="stat-val">₹0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-lbl">Books Sold</div>
+            <div id="dcTotalBooks" class="stat-val">0</div>
+          </div>
+          <div class="stat-card" style="border-left:4px solid var(--green);">
+            <div class="stat-lbl" style="color:var(--green-dark);">Hand Cash</div>
+            <div id="dcTotalCash" class="stat-val" style="color:var(--green-dark);">₹0</div>
+          </div>
+          <div class="stat-card" style="border-left:4px solid var(--purple);">
+            <div class="stat-lbl" style="color:var(--purple);">PhonePe / UPI</div>
+            <div id="dcTotalUpi" class="stat-val" style="color:var(--purple);">₹0</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px;">Breakdown by Title</div>
+        <div id="dcBreakdownList" style="font-size:12px; max-height:160px; overflow-y:auto; border-top:1px solid var(--border); padding-top:6px; margin-bottom:14px;">
+          <div style="color:var(--muted); font-style:italic;">No sales yet for this shift.</div>
+        </div>
+
+        <button class="btn-whatsapp" onclick="shareWhatsApp()">
+          <span>💬</span>
+          <span>Share Day-Close on WhatsApp</span>
+        </button>
+
+        <button class="btn-secondary" style="width:100%;" onclick="endShiftPrompt()">End Shift & Switch</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FLOATING CHECKOUT BAR -->
+  <div id="floatingCart" class="floating-cart hidden">
+    <div>
+      <div id="cartCountLabel" class="cart-summary-qty">0 books selected</div>
+      <div id="cartSumLabel" class="cart-summary-total">₹0</div>
+    </div>
+    <button class="btn-checkout" onclick="openPaymentModal()">Checkout ➔</button>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav>
+    <button id="navBilling" class="nav-btn active" onclick="switchTab('tabBilling')">
+      <span class="nav-icon">🛒</span>
+      <span>POS Billing</span>
+    </button>
+    <button id="navReceiving" class="nav-btn" onclick="switchTab('tabReceiving')">
+      <span class="nav-icon">📦</span>
+      <span>Receiving</span>
+    </button>
+    <button id="navReturns" class="nav-btn" onclick="switchTab('tabReturns')">
+      <span class="nav-icon">🔄</span>
+      <span>Returns</span>
+    </button>
+    <button id="navDayClose" class="nav-btn" onclick="switchTab('tabDayClose')">
+      <span class="nav-icon">💵</span>
+      <span>Day Close</span>
+    </button>
+  </nav>
+
+  <!-- SHIFT ROTATION MODAL -->
+  <div id="shiftModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-tag">Stall Rotation</span>
+        <h3 class="modal-title">Select Stall & Shift</h3>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Stall Location</label>
+        <div class="stall-grid">
+          <button type="button" class="stall-choice" onclick="selectStall('SP')" id="btnStallSP">SP</button>
+          <button type="button" class="stall-choice" onclick="selectStall('SVM')" id="btnStallSVM">SVM</button>
+          <button type="button" class="stall-choice" onclick="selectStall('VSR')" id="btnStallVSR">VSR</button>
+          <button type="button" class="stall-choice" onclick="selectStall('GT')" id="btnStallGT">GT</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Duty Shift</label>
+        <div class="shift-grid">
+          <button type="button" class="shift-choice" onclick="selectShift(1)" id="btnShift1">
+            <div style="font-size:12px; font-weight:800;">Shift 1</div>
+            <div style="font-size:10px; color:var(--muted);">08:00 AM - 02:00 PM</div>
+          </button>
+          <button type="button" class="shift-choice" onclick="selectShift(2)" id="btnShift2">
+            <div style="font-size:12px; font-weight:800;">Shift 2</div>
+            <div style="font-size:10px; color:var(--muted);">02:00 PM - 08:00 PM</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Volunteers</label>
+        <input type="text" id="shiftVolunteerInput" class="input-text" placeholder="e.g. Balaji & Ramudu">
+      </div>
+
+      <button class="btn-submit" onclick="saveShiftModal()">Confirm Check-In</button>
+    </div>
+  </div>
+
+  <!-- PAYMENT MODAL (WITH SPLIT & PHONEPE QR) -->
+  <div id="paymentModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px;">
+        <div>
+          <h3 style="font-size:16px; font-weight:800;">Payment</h3>
+          <p id="payShiftSub" style="font-size:11px; color:var(--muted);"></p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px; font-weight:700; color:var(--muted); text-transform:uppercase;">Amount Due</div>
+          <div id="payDueAmount" style="font-size:22px; font-weight:900; color:var(--navy);">₹0</div>
+        </div>
+      </div>
+
+      <!-- PAY MODES -->
+      <div class="pay-mode-toggle">
+        <button type="button" class="pay-btn" id="btnPayCash" onclick="setPayMode('CASH')">💵 Cash</button>
+        <button type="button" class="pay-btn" id="btnPayUpi" onclick="setPayMode('UPI')">📱 PhonePe</button>
+        <button type="button" class="pay-btn" id="btnPaySplit" onclick="setPayMode('SPLIT')">⚖️ Split</button>
+      </div>
+
+      <!-- SPLIT INPUT BOX -->
+      <div id="splitBox" class="split-box hidden">
+        <div class="split-input-row">
+          <span style="font-size:12px; font-weight:700; color:#581c87;">Hand Cash Received:</span>
+          <input type="number" id="splitCashInput" class="input-text" style="width:110px; padding:6px; font-size:15px; font-weight:800; text-align:right;" oninput="onSplitCashInput(this.value)">
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#581c87; border-top:1px dashed var(--purple-border); padding-top:6px;">
+          <span>Remaining on PhonePe:</span>
+          <span id="splitUpiRemaining" style="font-size:16px; font-weight:900;">₹0</span>
+        </div>
+      </div>
+
+      <!-- QR CODE CONTAINER -->
+      <div id="qrBox" class="qr-box hidden">
+        <div style="font-size:11px; font-weight:700; color:var(--muted);">Customer Scans with PhonePe / UPI</div>
+        <img id="dynamicQrImg" src="" alt="UPI QR">
+        <div id="qrAmountNotice" style="font-size:14px; font-weight:800; color:var(--accent-blue);">Pay ₹0</div>
+        <div id="qrUpiNotice" style="font-size:10px; font-family:monospace; color:var(--muted);"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closePaymentModal()">Cancel</button>
+        <button type="button" class="btn-primary" onclick="confirmPaymentAndSave()">Complete Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- BBT CONFIGURATION & DEFAULTS ---
+    const STALLS = {
+      SP:  { name: 'SP Stall',  upiId: 'bbt.sp@ybl',  mid: 'BBT-SP-01' },
+      SVM: { name: 'SVM Stall', upiId: 'bbt.svm@ybl', mid: 'BBT-SVM-01' },
+      VSR: { name: 'VSR Stall', upiId: 'bbt.vsr@ybl', mid: 'BBT-VSR-01' },
+      GT:  { name: 'GT Stall',  upiId: 'bbt.gt@ybl',  mid: 'BBT-GT-01' }
+    };
+
+    const INITIAL_INVENTORY = [
+      { id: 'bbt-001-tel', title: 'Bhagavad Gita As It Is - Deluxe', lang: 'Telugu', code: 'BBT-001-TEL', price: 600, stock: 5 },
+      { id: 'bbt-002-tel', title: 'Bhagavad Gita As It Is (BIG)', lang: 'Telugu', code: 'BBT-002-TEL', price: 350, stock: 51 },
+      { id: 'bbt-002-eng', title: 'Bhagavad Gita As It Is (BIG)', lang: 'English', code: 'BBT-002-ENG', price: 400, stock: 24 },
+      { id: 'bbt-002-hin', title: 'Bhagavad Gita As It Is (BIG)', lang: 'Hindi', code: 'BBT-002-HIN', price: 350, stock: 7 },
+      { id: 'bbt-002-tam', title: 'Bhagavad Gita As It Is (BIG)', lang: 'Tamil', code: 'BBT-002-TAM', price: 350, stock: 2 },
+      { id: 'bbt-002-kan', title: 'Bhagavad Gita As It Is (BIG)', lang: 'Kannada', code: 'BBT-002-KAN', price: 350, stock: 2 },
+      { id: 'bbt-003-tel', title: 'Science of Self Realization', lang: 'Telugu', code: 'BBT-003-TEL', price: 80, stock: 35 },
+      { id: 'bbt-004-tel', title: 'Beyond Birth and Death', lang: 'Telugu', code: 'BBT-004-TEL', price: 30, stock: 50 },
+      { id: 'bbt-005-tel', title: 'Perfection of Yoga', lang: 'Telugu', code: 'BBT-005-TEL', price: 30, stock: 40 }
+    ];
+
+    // --- STATE ---
+    let activeShift = {
+      stallId: 'SVM',
+      shiftNumber: 1,
+      volunteers: 'Balaji & Ramudu',
+      upiId: 'bbt.svm@ybl',
+      mid: 'BBT-SVM-01'
+    };
+
+    let books = [];
+    let cart = {}; // bookId -> qty
+    let shiftSales = [];
+    let chosenStall = 'SVM';
+    let chosenShift = 1;
+
+    let currentPayMode = 'CASH';
+    let cashPaid = 0;
+    let upiPaid = 0;
+
+    // --- ON LOAD ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Shift
+      const savedShift = localStorage.getItem('bbt_shift_session');
+      if (savedShift) {
+        try { activeShift = JSON.parse(savedShift); } catch(e){}
+      } else {
+        const hour = new Date().getHours();
+        activeShift.shiftNumber = (hour >= 14 && hour < 20) ? 2 : 1;
+      }
+
+      // 2. Books
+      const savedBooks = localStorage.getItem('bbt_stock');
+      books = savedBooks ? JSON.parse(savedBooks) : INITIAL_INVENTORY;
+      saveStock();
+
+      // 3. Sales
+      const savedSales = localStorage.getItem('bbt_sales_history');
+      shiftSales = savedSales ? JSON.parse(savedSales) : [];
+
+      updateUI();
+      renderBooks();
+      updateDropdowns();
+      renderDayClose();
+    });
+
+    function saveStock() {
+      localStorage.setItem('bbt_stock', JSON.stringify(books));
+    }
+
+    function saveSales() {
+      localStorage.setItem('bbt_sales_history', JSON.stringify(shiftSales));
+    }
+
+    function updateUI() {
+      const cfg = STALLS[activeShift.stallId] || STALLS.SVM;
+      document.getElementById('hdrBadge').textContent = `${activeShift.stallId} - ${activeShift.shiftNumber}`;
+      document.getElementById('hdrVolunteer').textContent = activeShift.volunteers || 'Volunteer';
+      document.getElementById('hdrUpi').textContent = `UPI: ${cfg.upiId}`;
+      document.getElementById('hdrMid').textContent = `MID: ${cfg.mid}`;
+    }
+
+    // --- TAB SWITCHER ---
+    function switchTab(tabId) {
+      ['tabBilling', 'tabReceiving', 'tabReturns', 'tabDayClose'].forEach(t => {
+        document.getElementById(t).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+
+      ['navBilling', 'navReceiving', 'navReturns', 'navDayClose'].forEach(n => {
+        document.getElementById(n).classList.remove('active');
+      });
+
+      const navMap = {
+        tabBilling: 'navBilling',
+        tabReceiving: 'navReceiving',
+        tabReturns: 'navReturns',
+        tabDayClose: 'navDayClose'
+      };
+      document.getElementById(navMap[tabId]).classList.add('active');
+
+      if (tabId === 'tabDayClose') {
+        renderDayClose();
+      }
+    }
+
+    // --- BOOKS LISTING ---
+    function renderBooks() {
+      const listEl = document.getElementById('bookList');
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const lang = document.getElementById('langFilter').value;
+
+      const filtered = books.filter(b => {
+        const matchQ = b.title.toLowerCase().includes(q) || b.code.toLowerCase().includes(q);
+        const matchL = (lang === 'ALL') || (b.lang === lang);
+        return matchQ && matchL;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center; padding:30px; color:var(--muted); font-size:12px;">No books found matching search</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(b => {
+        const inCart = cart[b.id] || 0;
+        return `
+          <div class="book-card">
+            <div class="book-info">
+              <div class="book-title">${b.title}</div>
+              <div class="book-meta">
+                <span class="tag-lang">${b.lang}</span>
+                <span class="book-code">${b.code}</span>
+              </div>
+            </div>
+            <div class="book-pricing">
+              <div class="book-price">₹${b.price}</div>
+              <div class="book-stock">${b.stock} in stock</div>
+              ${inCart === 0 ? `
+                <button class="btn-add" onclick="addToCart('${b.id}')" ${b.stock <= 0 ? 'disabled style="opacity:0.4"' : ''}>+ Add</button>
+              ` : `
+                <div class="qty-stepper">
+                  <button onclick="changeQty('${b.id}', -1)">-</button>
+                  <span>${inCart}</span>
+                  <button onclick="changeQty('${b.id}', 1)" ${inCart >= b.stock ? 'disabled style="opacity:0.3"' : ''}>+</button>
+                </div>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      renderCartBar();
+    }
+
+    // --- CART ---
+    function addToCart(id) {
+      const b = books.find(x => x.id === id);
+      if (!b || b.stock <= 0) return;
+      cart[id] = 1;
+      renderBooks();
+    }
+
+    function changeQty(id, delta) {
+      const cur = cart[id] || 0;
+      const next = cur + delta;
+      if (next <= 0) {
+        delete cart[id];
+      } else {
+        const b = books.find(x => x.id === id);
+        if (b && next <= b.stock) {
+          cart[id] = next;
+        }
+      }
+      renderBooks();
+    }
+
+    function getCartTotals() {
+      let count = 0;
+      let total = 0;
+      Object.keys(cart).forEach(id => {
+        const b = books.find(x => x.id === id);
+        if (b) {
+          count += cart[id];
+          total += cart[id] * b.price;
+        }
+      });
+      return { count, total };
+    }
+
+    function renderCartBar() {
+      const { count, total } = getCartTotals();
+      const bar = document.getElementById('floatingCart');
+      if (count > 0) {
+        bar.classList.remove('hidden');
+        document.getElementById('cartCountLabel').textContent = `${count} ${count === 1 ? 'book' : 'books'} selected`;
+        document.getElementById('cartSumLabel').textContent = `₹${total}`;
+      } else {
+        bar.classList.add('hidden');
+      }
+    }
+
+    // --- CHECKOUT & SPLIT PAYMENT ---
+    function openPaymentModal() {
+      const { total } = getCartTotals();
+      if (total <= 0) return;
+
+      document.getElementById('payDueAmount').textContent = `₹${total}`;
+      document.getElementById('payShiftSub').textContent = `${activeShift.stallId} • Shift ${activeShift.shiftNumber}`;
+      document.getElementById('paymentModal').classList.remove('hidden');
+
+      setPayMode('CASH');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+    function setPayMode(mode) {
+      currentPayMode = mode;
+      const { total } = getCartTotals();
+
+      ['btnPayCash', 'btnPayUpi', 'btnPaySplit'].forEach(b => {
+        document.getElementById(b).classList.remove('selected');
+      });
+
+      const splitBox = document.getElementById('splitBox');
+      const qrBox = document.getElementById('qrBox');
+
+      if (mode === 'CASH') {
+        document.getElementById('btnPayCash').classList.add('selected');
+        splitBox.classList.add('hidden');
+        qrBox.classList.add('hidden');
+        cashPaid = total;
+        upiPaid = 0;
+      } else if (mode === 'UPI') {
+        document.getElementById('btnPayUpi').classList.add('selected');
+        splitBox.classList.add('hidden');
+        qrBox.classList.remove('hidden');
+        cashPaid = 0;
+        upiPaid = total;
+        updateQr(total);
+      } else if (mode === 'SPLIT') {
+        document.getElementById('btnPaySplit').classList.add('selected');
+        splitBox.classList.remove('hidden');
+        qrBox.classList.remove('hidden');
+
+        const half = Math.floor(total / 2);
+        cashPaid = half;
+        upiPaid = total - half;
+        document.getElementById('splitCashInput').value = cashPaid;
+        document.getElementById('splitUpiRemaining').textContent = `₹${upiPaid}`;
+        updateQr(upiPaid);
+      }
+    }
+
+    function onSplitCashInput(val) {
+      const { total } = getCartTotals();
+      let inputCash = Number(val) || 0;
+      if (inputCash < 0) inputCash = 0;
+      if (inputCash > total) inputCash = total;
+
+      cashPaid = inputCash;
+      upiPaid = total - cashPaid;
+
+      document.getElementById('splitUpiRemaining').textContent = `₹${upiPaid}`;
+      const qrBox = document.getElementById('qrBox');
+      if (upiPaid > 0) {
+        qrBox.classList.remove('hidden');
+        updateQr(upiPaid);
+      } else {
+        qrBox.classList.add('hidden');
+      }
+    }
+
+    function updateQr(amt) {
+      const cfg = STALLS[activeShift.stallId] || STALLS.SVM;
+      const upiUrl = `upi://pay?pa=${cfg.upiId}&pn=BBT%20Stall%20${activeShift.stallId}&am=${amt}&cu=INR&tn=BBT%20Books`;
+      const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+
+      document.getElementById('dynamicQrImg').src = qrSrc;
+      document.getElementById('qrAmountNotice').textContent = `Pay Exactly ₹${amt}`;
+      document.getElementById('qrUpiNotice').textContent = cfg.upiId;
+    }
+
+    function confirmPaymentAndSave() {
+      const { total } = getCartTotals();
+      if (cashPaid + upiPaid !== total) {
+        alert(`Cash + PhonePe must match total ₹${total}`);
+        return;
+      }
+
+      const soldItems = [];
+      Object.keys(cart).forEach(id => {
+        const b = books.find(x => x.id === id);
+        if (b) {
+          b.stock -= cart[id];
+          soldItems.push({
+            id: b.id,
+            title: b.title,
+            lang: b.lang,
+            qty: cart[id],
+            price: b.price
+          });
+        }
+      });
+      saveStock();
+
+      const saleRec = {
+        id: 'SALE-' + Date.now(),
+        stallId: activeShift.stallId,
+        shiftNumber: activeShift.shiftNumber,
+        volunteers: activeShift.volunteers,
+        date: new Date().toISOString(),
+        total,
+        cash: cashPaid,
+        upi: upiPaid,
+        mode: currentPayMode,
+        items: soldItems
+      };
+
+      shiftSales.push(saleRec);
+      saveSales();
+
+      cart = {};
+      closePaymentModal();
+      renderBooks();
+      renderDayClose();
+      alert(`Sale of ₹${total} successfully recorded!`);
+    }
+
+    // --- SHIFT CHECK-IN MODAL ---
+    function openShiftModal() {
+      chosenStall = activeShift.stallId || 'SVM';
+      chosenShift = activeShift.shiftNumber || 1;
+      document.getElementById('shiftVolunteerInput').value = activeShift.volunteers || '';
+
+      selectStall(chosenStall);
+      selectShift(chosenShift);
+      document.getElementById('shiftModal').classList.remove('hidden');
+    }
+
+    function selectStall(s) {
+      chosenStall = s;
+      ['btnStallSP', 'btnStallSVM', 'btnStallVSR', 'btnStallGT'].forEach(id => {
+        document.getElementById(id).classList.remove('selected');
+      });
+      document.getElementById(`btnStall${s}`).classList.add('selected');
+    }
+
+    function selectShift(num) {
+      chosenShift = num;
+      document.getElementById('btnShift1').classList.remove('selected');
+      document.getElementById('btnShift2').classList.remove('selected');
+      document.getElementById(`btnShift${num}`).classList.add('selected');
+    }
+
+    function saveShiftModal() {
+      const vol = document.getElementById('shiftVolunteerInput').value.trim();
+      if (!vol) {
+        alert('Please enter volunteer name');
+        return;
+      }
+
+      activeShift.stallId = chosenStall;
+      activeShift.shiftNumber = chosenShift;
+      activeShift.volunteers = vol;
+      activeShift.upiId = STALLS[chosenStall].upiId;
+      activeShift.mid = STALLS[chosenStall].mid;
+
+      localStorage.setItem('bbt_shift_session', JSON.stringify(activeShift));
+
+      updateUI();
+      renderDayClose();
+      document.getElementById('shiftModal').classList.add('hidden');
+    }
+
+    // --- DAY CLOSE & WHATSAPP ---
+    function renderDayClose() {
+      document.getElementById('dcShiftInfo').textContent = `${activeShift.stallId} - Shift ${activeShift.shiftNumber} (${activeShift.volunteers})`;
+
+      let totalSales = 0;
+      let totalBooks = 0;
+      let totalCash = 0;
+      let totalUpi = 0;
+      const bookMap = {};
+
+      shiftSales.forEach(s => {
+        if (s.stallId === activeShift.stallId && s.shiftNumber === activeShift.shiftNumber) {
+          totalSales += s.total || 0;
+          totalCash += s.cash || 0;
+          totalUpi += s.upi || 0;
+
+          (s.items || []).forEach(it => {
+            totalBooks += it.qty;
+            const key = `${it.title} (${it.lang})`;
+            bookMap[key] = (bookMap[key] || 0) + it.qty;
+          });
+        }
+      });
+
+      document.getElementById('dcTotalSales').textContent = `₹${totalSales}`;
+      document.getElementById('dcTotalBooks').textContent = totalBooks;
+      document.getElementById('dcTotalCash').textContent = `₹${totalCash}`;
+      document.getElementById('dcTotalUpi').textContent = `₹${totalUpi}`;
+
+      const listEl = document.getElementById('dcBreakdownList');
+      const keys = Object.keys(bookMap);
+      if (keys.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--muted); font-style:italic;">No sales yet for this shift.</div>';
+      } else {
+        listEl.innerHTML = keys.map(k => `
+          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f1f5f9;">
+            <span>${k}</span>
+            <span style="font-weight:700;">${bookMap[k]} copies</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function shareWhatsApp() {
+      let totalSales = 0;
+      let totalBooks = 0;
+      let totalCash = 0;
+      let totalUpi = 0;
+      const bookMap = {};
+
+      shiftSales.forEach(s => {
+        if (s.stallId === activeShift.stallId && s.shiftNumber === activeShift.shiftNumber) {
+          totalSales += s.total || 0;
+          totalCash += s.cash || 0;
+          totalUpi += s.upi || 0;
+
+          (s.items || []).forEach(it => {
+            totalBooks += it.qty;
+            const key = `${it.title} (${it.lang})`;
+            bookMap[key] = (bookMap[key] || 0) + it.qty;
+          });
+        }
+      });
+
+      let itemsSummary = '';
+      Object.keys(bookMap).forEach(k => {
+        itemsSummary += `• ${k}: *${bookMap[k]}*\n`;
+      });
+      if (!itemsSummary) itemsSummary = 'None\n';
+
+      const today = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+
+      const text = `*BBT STALL DAY-CLOSE REPORT* 📊\n` +
+        `📅 Date: ${today}\n` +
+        `🏛️ Stall: *${activeShift.stallId}*\n` +
+        `⏱️ Shift: *Shift ${activeShift.shiftNumber}* (8AM-2PM / 2PM-8PM)\n` +
+        `👤 Volunteers: *${activeShift.volunteers}*\n` +
+        `-----------------------------\n` +
+        `📚 Books Sold: *${totalBooks}*\n` +
+        `💵 Cash in Hand: *₹${totalCash}*\n` +
+        `📱 PhonePe / UPI: *₹${totalUpi}*\n` +
+        `💰 *Total Sale: ₹${totalSales}*\n` +
+        `-----------------------------\n` +
+        `*Books Breakdown:*\n` +
+        itemsSummary +
+        `-----------------------------\n` +
+        `_BBT Stall POS App_`;
+
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function endShiftPrompt() {
+      if (!confirm('Close current shift and change duty?')) return;
+      activeShift.shiftNumber = activeShift.shiftNumber === 1 ? 2 : 1;
+      localStorage.setItem('bbt_shift_session', JSON.stringify(activeShift));
+      openShiftModal();
+    }
+
+    // --- RECEIVING & RETURNS ---
+    function updateDropdowns() {
+      const opts = books.map(b => `<option value="${b.id}">${b.title} (${b.lang}) - Stock: ${b.stock}</option>`).join('');
+      document.getElementById('recvSelect').innerHTML = opts;
+      document.getElementById('retSelect').innerHTML = opts;
+    }
+
+    function submitReceiving() {
+      const id = document.getElementById('recvSelect').value;
+      const qty = parseInt(document.getElementById('recvQty').value, 10);
+      if (!qty || qty <= 0) return alert('Enter valid quantity');
+
+      const b = books.find(x => x.id === id);
+      if (b) {
+        b.stock += qty;
+        saveStock();
+        renderBooks();
+        updateDropdowns();
+        document.getElementById('recvQty').value = '';
+        alert(`Added ${qty} copies of ${b.title}`);
+        switchTab('tabBilling');
+      }
+    }
+
+    function submitReturn() {
+      const id = document.getElementById('retSelect').value;
+      const qty = parseInt(document.getElementById('retQty').value, 10);
+      if (!qty || qty <= 0) return alert('Enter valid quantity');
+
+      const b = books.find(x => x.id === id);
+      if (b) {
+        if (b.stock < qty) return alert(`Cannot return more than current stock (${b.stock})`);
+        b.stock -= qty;
+        saveStock();
+        renderBooks();
+        updateDropdowns();
+        document.getElementById('retQty').value = '';
+        alert(`Returned ${qty} copies of ${b.title}`);
+        switchTab('tabBilling');
+      }
+    }
+  </script>
+</body>
+</html>
