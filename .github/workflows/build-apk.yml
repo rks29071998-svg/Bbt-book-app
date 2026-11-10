@@ -1,47 +1,60 @@
-name: Build Android APK
+name: Build BBT Android Debug APK
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Set up JDK 17
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 21
 
-      - name: Install Capacitor Dependencies
+      - name: Create Capacitor project
+        working-directory: bbt-app-source
         run: |
-          npm install
+          npm init -y
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
 
-      - name: Initialize Android Project
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.bbt.bookdistribution",
+            "appName": "BBT App",
+            "webDir": ".",
+            "bundledWebRuntime": false
+          }
+          EOF
+
+      - name: Add Android platform
+        working-directory: bbt-app-source
         run: |
           npx cap add android
           npx cap sync android
 
-      - name: Build Debug APK with Gradle
+      - name: Build Debug APK
+        working-directory: bbt-app-source/android
         run: |
-          cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BBT-Distribution-App
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          
+          name: BBT-App-Debug-APK
+          path: bbt-app-source/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
